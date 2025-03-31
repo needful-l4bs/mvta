@@ -1,0 +1,70 @@
+#!/bin/bash
+# AUT0Script for Amnesty International - Mobile Verification Toolkit
+# For macOS,  BREW or PIP must be installed.
+# Check your Privatcy Settings, Disc Access for Terminal.
+# FILE NAME = mvta
+# AUTHOR    = n33dful.l4bs
+# VERSION	= 1.9a
+
+# Variables
+SourceBackup=`ls ./Library/Application\ Support/MobileSync/Backup`
+Stix2File="./mvt/investigations/2021-07-18_nso/pegasus.stix2"
+DecryptedBackup="./mvt/DecryptedBackup"
+DestinationResults="./mvt/CheckedBackup"
+WorkDirectory=($DecryptedBackup, $DestinationResults)
+
+# If nothing exist!?
+[ ! -d $WorkDirectory ] && mkdir -p ./mvt/{DecryptedBackup,CheckedBackup}
+[ ! -f $Stix2File ] && git clone https://github.com/AmnestyTech/investigations/ ./mvt/investigations
+
+# List found Backups
+PS3="Select Device number of UUID :  "
+select UUID in $SourceBackup; do
+
+	# Enter Backup-Password for decryption
+	clear
+	printf "\e[0;32mType Backup-Password            "
+	read -s BAKPW0
+	printf "[ \e[0;36mPASS\e[0;32m ]\nRetype Backup-Password          "
+	read -s BAKPW1
+
+	# Check entered Passwords for match.
+	if [ $BAKPW0 = $BAKPW1 ]; then
+
+		# Entered Passwords are equality
+		printf "[ \e[0;36mPASS\e[0;32m ]\n"
+
+		# Decrypting the Backup
+		printf "\e[0;32mDecrypting in progress...       "
+		mvt-ios decrypt-backup -p $BAKPW0 -d $DecryptedBackup ./Library/Application\ Support/MobileSync/Backup/$UUID >>./mvt/Decrypt.log
+		printf "[ \e[0;36mDONE\e[0;32m ]\n"
+
+		# Check the decrypted Backup.
+		printf "\e[0;32mChecking in progress...         "
+		mvt-ios check-backup -i $Stix2File -o $DestinationResults $DecryptedBackup >>./mvt/Ceck.log
+
+		# Show resultats.
+		if [ -f $DestinationResults/*detected* ]; then
+
+			# If Backup detected!
+			printf "[\e[0;31mDETECT\e[0;32m]\n"
+		else
+				
+			# If Backup Clean.
+			printf "[\e[0;36m GOOD \e[0,32m]\n"
+			[ -d $DestinationResults/ ] && rm -R ./mvt/CheckedBackup/*
+		fi
+
+		# Delete last Session :)
+		printf "\e[0;32mDelete last Session...          "
+		[ -d $DecryptedBackup/ ] && rm -R ./mvt/DecryptedBackup/*
+		printf "[ \e[0;36mDONE\e[0;32m ]\n"
+		break;
+	else
+
+		# Entered Passwords are mismatched
+		printf "[ \e[0;31mFAIL\e[0;32m ]\n\n"
+		break;
+	fi
+	break;
+done
