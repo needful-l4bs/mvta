@@ -1,21 +1,21 @@
 #!/bin/bash
-# AUT0Script for Amnesty International - Mobile Verification Toolkit
-# For macOS,  BREW or PIP must be installed.
+# a little AUT0Script :) for Amnesty International - Mobile Verification Toolkit
 # Check your Privatcy Settings, Disc Access for Terminal.
 # FILE NAME = mvta
 # AUTHOR    = n33dful.l4bs
-# VERSION	= 1.9a
+# VERSION	= 1.0a
 
 # Variables
-SourceBackup=`ls ./Library/Application\ Support/MobileSync/Backup`
-Stix2File="./mvt/investigations/2021-07-18_nso/pegasus.stix2"
-DecryptedBackup="./mvt/DecryptedBackup"
-DestinationResults="./mvt/CheckedBackup"
+UserDirectory="/Users/`whoami`"
+SourceBackup=`ls $UserDirectory/Library/Application\ Support/MobileSync/Backup`
+Stix2File="$UserDirectory/mvt/investigations/2021-07-18_nso/pegasus.stix2"
+DecryptedBackup="$UserDirectory/mvt/DecryptedBackup"
+DestinationResults="$UserDirectory/mvt/CheckedBackup"
 WorkDirectory=($DecryptedBackup, $DestinationResults)
 
 # If nothing exist!?
-[ ! -d $WorkDirectory ] && mkdir -p ./mvt/{DecryptedBackup,CheckedBackup}
-[ ! -f $Stix2File ] && git clone https://github.com/AmnestyTech/investigations/ ./mvt/investigations
+[ ! -d $WorkDirectory ] && mkdir -p $UserDirectory/mvt/{DecryptedBackup,CheckedBackup}
+[ ! -f $Stix2File ] && git clone https://github.com/AmnestyTech/investigations/ $UserDirectory/mvt/investigations
 
 # List found Backups
 PS3="Select Device number of UUID :  "
