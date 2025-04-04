@@ -3,9 +3,9 @@
 # Check your Privatcy Settings, Disc Access for Terminal.
 # FILE NAME = mvta
 # AUTHOR    = n33dful.l4bs
-# VERSION	= 1.0a
+# VERSION	= 1.01a
 
-# Variables
+# Variablesvta
 UserDirectory="/Users/`whoami`"
 SourceBackup=`ls $UserDirectory/Library/Application\ Support/MobileSync/Backup`
 Stix2File="$UserDirectory/mvt/investigations/2021-07-18_nso/pegasus.stix2"
@@ -36,7 +36,7 @@ select UUID in $SourceBackup; do
 
 		# Decrypting the Backup
 		printf "\e[0;32mDecrypting in progress...       "
-		mvt-ios decrypt-backup -p $BAKPW0 -d $DecryptedBackup ./Library/Application\ Support/MobileSync/Backup/$UUID >>./mvt/Decrypt.log
+		mvt-ios decrypt-backup -p $BAKPW0 -d $DecryptedBackup $UserDirectory/Library/Application\ Support/MobileSync/Backup/$UUID >>./mvt/Decrypt.log
 		printf "[ \e[0;36mDONE\e[0;32m ]\n"
 
 		# Check the decrypted Backup.
@@ -52,12 +52,12 @@ select UUID in $SourceBackup; do
 				
 			# If Backup Clean.
 			printf "[\e[0;36m GOOD \e[0,32m]\n"
-			[ -d $DestinationResults/ ] && rm -R ./mvt/CheckedBackup/*
+			[ -d $DestinationResults ] && rm -R ./mvt/CheckedBackup/*
 		fi
 
 		# Delete last Session :)
 		printf "\e[0;32mDelete last Session...          "
-		[ -d $DecryptedBackup/ ] && rm -R ./mvt/DecryptedBackup/*
+		[ -d $DecryptedBackup ] && rm -R $UserDirectory/mvt/DecryptedBackup/*
 		printf "[ \e[0;36mDONE\e[0;32m ]\n"
 		break;
 	else
