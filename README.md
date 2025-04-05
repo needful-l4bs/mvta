@@ -1,4 +1,2 @@
-<p>Yes, it can be done more efficiently :)</p>
-<p></p>
-<br>chmod +x ./mvta</br>
-<p></p>./mvta</p>
+<p>A small script for Amnesty International - Mobile Verification Toolkit (macOS)</p>
+<br>From Commandline ./mvta or oneClick via Finder</br>

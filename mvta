@@ -1,6 +1,7 @@
 #!/bin/bash
-# a little AUT0Script :) for Amnesty International - Mobile Verification Toolkit
-# Check your Privatcy Settings, Disc Access for Terminal. ( macOS ) OpenSource :)
+# AUT0Script for Amnesty International - Mobile Verification Toolkit on (macOS)
+# Check your Privatcy Settings -> Disc Access for Terminal.
+# Run this via oneClick from Finder or from commandline ./mvta
 # FILE NAME = mvta
 # AUTHOR    = n33dful.l4bs
 # VERSION	= 1.01m
