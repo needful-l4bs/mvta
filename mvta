@@ -39,7 +39,7 @@ select UUID in $SourceBackup; do
 
 		# Check the decrypted Backup.
 		printf "\e[0;32mChecking in progress...         "
-		mvt-ios check-backup -i $Stix2File -o $WorkDirectory/mvt/CheckedBackup $WorkDirectory/mvt/DecryptedBackup >>$WorkDirectory/mvt/Ceck.log
+		mvt-ios check-backup -i $Stix2File -o $WorkDirectory/mvt/CheckedBackup $WorkDirectory/mvt/DecryptedBackup >>$WorkDirectory/mvt/Check.log
 
 		# Show resultats.
 		if [ -f $WorkDirectory/mvt/CheckedBackup/*detected* ]; then
