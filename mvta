@@ -3,18 +3,22 @@
 # Check your Privatcy Settings -> Disc Access for Terminal.
 # Run this via oneClick from Finder or from commandline ./mvta
 # FILE NAME	= mvta
-# AUTHOR	= n33dful.l4bs
-# VERSION	= 1.01m
+# AUTHOR	= n33dful-l4bs :)
+# VERSION	= 1.05m
 
 # Variables
 WorkDirectory="/Users/`whoami`"
 SourceBackup=`ls $WorkDirectory/Library/Application\ Support/MobileSync/Backup`
-Stix2File="$WorkDirectory/mvt/investigations/2021-07-18_nso/pegasus.stix2"
+Stix2FileLocation=`ls $WorkDirectory/Library/Application\ Support/mvt/indicators`
 
 # If nothing exist!?
 [ ! -d $WorkDirectory/mvt ] && mkdir -p $WorkDirectory/mvt/{DecryptedBackup,CheckedBackup}
-[ ! -f $Stix2File ] && git clone https://github.com/AmnestyTech/investigations/ $WorkDirectory/mvt/investigations
 clear
+
+# Update IOCS Files
+printf "\e[0;32mUpdate IOCS...                  "
+mvt-ios download-iocs >> $WorkDirectory/mvt/Session.log
+printf "[ \e[0;36mDONE\e[0;32m ]\n"
 
 # List found Backups
 PS3="Select UUID by number :         "
@@ -34,29 +38,36 @@ select UUID in $SourceBackup; do
 
 		# Decrypting the Backup
 		printf "\e[0;32mDecrypting in progress...       "
-		mvt-ios decrypt-backup -p $BAKPW0 -d $WorkDirectory/mvt/DecryptedBackup $WorkDirectory/Library/Application\ Support/MobileSync/Backup/$UUID >>$WorkDirectory/mvt/Decrypt.log
+		mvt-ios decrypt-backup -p $BAKPW0 -d $WorkDirectory/mvt/DecryptedBackup $WorkDirectory/Library/Application\ Support/MobileSync/Backup/$UUID >>$WorkDirectory/mvt/Session.log
 		printf "[ \e[0;36mDONE\e[0;32m ]\n"
 
-		# Check the decrypted Backup.
-		printf "\e[0;32mChecking in progress...         "
-		mvt-ios check-backup -i $Stix2File -o $WorkDirectory/mvt/CheckedBackup $WorkDirectory/mvt/DecryptedBackup >>$WorkDirectory/mvt/Check.log
+		# Select Stix2 File
+		PS3="Select Stix2 File by Number :  "
+		select IOCS in $Stix2FileLocation; do
 
-		# Show resultats.
-		if [ -f $WorkDirectory/mvt/CheckedBackup/*detected* ]; then
+			# Check the decrypted Backup.
+			printf "\e[0;32mChecking in progress...         "
+			mvt-ios check-backup -i $WorkDirectory/Library/Application\ Support/mvt/indicators/$IOCS -o $WorkDirectory/mvt/CheckedBackup $WorkDirectory/mvt/DecryptedBackup >>$WorkDirectory/mvt/Session.log
+			
+			# Show resultats.
+			if [ -f $WorkDirectory/mvt/CheckedBackup/*detected* ]; then
 
-			# If Backup detected!
-			printf "[\e[0;31mDETECT\e[0;32m]\n"
-			open /System/Library/CoreServices/Finder.app $WorkDirectory/mvt/CheckedBackup
-		else
+				# If Backup detected!
+				printf "[\e[0;31mDETECT\e[0;32m]\n"
+				open /System/Library/CoreServices/Finder.app $WorkDirectory/mvt/CheckedBackup
+			else
 				
-			# If Backup Clean.
-			printf "[\e[0;36m GOOD \e[0,32m]\n"
-			[ -d $WorkDirectory/mvt/CheckedBackup ] && rm -R $WorkDirectory/mvt/CheckedBackup/*
-		fi
+				# If Backup Clean.
+				printf "[\e[0;36m GOOD \e[0,32m]\n"
+				[ -d $WorkDirectory/mvt/CheckedBackup ] && rm -R $WorkDirectory/mvt/CheckedBackup/*
+			fi
+			break;
+		done
 
 		# Delete last Session :)
 		printf "\e[0;32mDelete last Session...          "
 		[ -d $WorkDirectory/mvt/DecryptedBackup ] && rm -R $WorkDirectory/mvt/DecryptedBackup/*
+		mv $WorkDirectory/mvt/Session.log $WorkDirectory/mvt/$UUID.log
 		printf "[ \e[0;36mDONE\e[0;32m ]\n"
 		break;
 	else
