@@ -4,7 +4,7 @@
 # Run this via oneClick from Finder or from commandline ./mvta
 # FILE NAME	= mvta
 # AUTHOR	= n33dful-l4bs :)
-# VERSION	= 1.05m
+# VERSION	= 1.1m
 
 # Variables
 WorkDirectory="/Users/`whoami`"
@@ -41,27 +41,27 @@ select UUID in $SourceBackup; do
 		mvt-ios decrypt-backup -p $BAKPW0 -d $WorkDirectory/mvt/DecryptedBackup $WorkDirectory/Library/Application\ Support/MobileSync/Backup/$UUID >>$WorkDirectory/mvt/Session.log
 		printf "[ \e[0;36mDONE\e[0;32m ]\n"
 
-		# Select Stix2 File
-		PS3="Select Stix2 File by Number :  "
-		select IOCS in $Stix2FileLocation; do
+		# Check with all IOCS from _mvt-ios download-iocs_ commmand
+		for IOCS in $Stix2FileLocation; do
+			while true; do
 
-			# Check the decrypted Backup.
-			printf "\e[0;32mChecking in progress...         "
-			mvt-ios check-backup -i $WorkDirectory/Library/Application\ Support/mvt/indicators/$IOCS -o $WorkDirectory/mvt/CheckedBackup $WorkDirectory/mvt/DecryptedBackup >>$WorkDirectory/mvt/Session.log
-			
-			# Show resultats.
-			if [ -f $WorkDirectory/mvt/CheckedBackup/*detected* ]; then
+				# Check the decrypted Backup.
+				printf "\e[0;32mCheck : $IOCS"
+				mvt-ios check-backup -i $WorkDirectory/Library/Application\ Support/mvt/indicators/$IOCS -o $WorkDirectory/mvt/CheckedBackup $WorkDirectory/mvt/DecryptedBackup >>$WorkDirectory/mvt/Session.log
 
-				# If Backup detected!
-				printf "[\e[0;31mDETECT\e[0;32m]\n"
-				open /System/Library/CoreServices/Finder.app $WorkDirectory/mvt/CheckedBackup
-			else
+				# Show resultats.
+				if [ -f $WorkDirectory/mvt/CheckedBackup/*detected* ]; then
+
+					# If Backup detected!
+					printf "\nResult: \e[0;41mDETECT\e[0;32m\n"
+				else
 				
-				# If Backup Clean.
-				printf "[\e[0;36m GOOD \e[0,32m]\n"
-				[ -d $WorkDirectory/mvt/CheckedBackup ] && rm -R $WorkDirectory/mvt/CheckedBackup/*
-			fi
-			break;
+					# If Backup Clean.
+					printf "\nResult: \e[0;42mOKAY\e[0;32m\n"
+					[ -d $WorkDirectory/mvt/CheckedBackup ] && rm -R $WorkDirectory/mvt/CheckedBackup/*
+				fi
+				break;
+			done
 		done
 
 		# Delete last Session :)
